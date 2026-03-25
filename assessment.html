@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Readiness Assessment — LetAtlas</title>
+<!-- Cal.com inline embed -->
+<script type="text/javascript">
+(function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+Cal("init", {origin:"https://cal.com"});
+Cal("ui", {"styles":{"branding":{"brandColor":"#1B3A5C"}},"hideEventTypeDetails":false,"layout":"month_view"});
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary: #1B3A5C;
+    --primary-light: #244b73;
+    --accent: #C9A84C;
+    --accent-glow: rgba(201,168,76,0.15);
+    --dark: #0A0A0A;
+    --dark-card: #141414;
+    --dark-card-hover: #1a1a1a;
+    --border: #222;
+    --text: #E8E8E8;
+    --text-muted: #999;
+    --text-dim: #666;
+    --radius: 10px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    padding: 48px 40px;
+    text-align: center;
+  }
+
+  .header .brand {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .header .brand span { color: var(--accent); }
+
+  .header h1 {
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .header p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  /* Container */
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--dark);
+    padding: 12px 0 8px;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  /* Steps */
+  .step {
+    display: none;
+    animation: fadeIn 0.35s ease;
+  }
+
+  .step.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-header {
+    margin-bottom: 28px;
+  }
+
+  .step-num {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .step-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .step-header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  /* Option cards (for business type) */
+  .option-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .option-card {
+    background: var(--dark-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .option-card:hover {
+    border-color: var(--accent);
+    background: var(--dark-card-hover);
+  }
+
+  .option-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  .option-card .icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .option-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+
+  .option-card p {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* Form fields */
+  .field {
+    margin-bottom: 22px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .field .hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .field input[type="text"],
+  .field input[type="number"],
+  .field textarea,
+  .field select {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--dark-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+  }
+
+  .field textarea { min-height: 80px; resize: vertical; }
+
+  .field select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5.5l6.5 6 6.5-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  .field select option { background: var(--dark-card); color: var(--text); }
+
+  /* Radio / Check groups */
+  .choice-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .choice-group.vertical { flex-direction: column; }
+
+  .choice-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    background: var(--dark-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+
+  .choice-pill:hover { border-color: var(--accent); }
+  .choice-pill input { accent-color: var(--accent); }
+
+  /* Slider */
+  .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  .slider-wrap input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+    height: 6px;
+  }
+
+  .slider-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 48px;
+    text-align: center;
+  }
+
+  /* Two column layout */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Navigation buttons */
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn {
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-back {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .btn-back:hover { border-color: var(--text-muted); color: var(--text); }
+
+  .btn-next {
+    background: var(--accent);
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  .btn-next:hover { background: #d4b45a; }
+  .btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-submit {
+    background: linear-gradient(135deg, var(--accent), #d4b45a);
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 15px;
+    padding: 14px 36px;
+  }
+
+  .btn-submit:hover { background: #d4b45a; }
+
+  /* Summary view */
+  .summary-block {
+    background: var(--dark-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .summary-block h3 {
+    font-size: 13px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+
+  .summary-row:last-child { border: none; }
+  .summary-row .label { color: var(--text-muted); }
+  .summary-row .value { color: var(--text); font-weight: 500; }
+
+  .copied-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: var(--primary);
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    display: none;
+    z-index: 999;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  /* Success screen */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .success-screen.active { display: block; }
+
+  .success-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+  }
+
+  .success-screen h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .success-screen p {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 480px;
+    margin: 0 auto 8px;
+    line-height: 1.6;
+  }
+
+  .success-screen .cta-line {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--primary);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    right: 14px;
+    top: 50%;
+    margin-top: -9px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 11px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  .footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .option-grid { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .header { padding: 32px 20px; }
+    .container { padding: 24px 16px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">Let<span>Atlas</span></div>
+  <h1>AI Readiness Assessment</h1>
+  <p>Answer a few questions about your business and we'll show you exactly where AI automation can make the biggest impact.</p>
+</div>
+
+<div class="container">
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">Step 1 of 5</div>
+  </div>
+
+  <!-- STEP 1: Business Type -->
+  <div class="step active" id="step1">
+    <div class="step-header">
+      <div class="step-num">Step 1</div>
+      <h2>What type of business do you run?</h2>
+      <p>Select the category that best fits. This tailors the rest of the assessment to your industry.</p>
+    </div>
+
+    <div class="option-grid" id="bizTypeGrid">
+      <div class="option-card" data-type="trades" onclick="selectBizType(this)">
+        <span class="icon">🔧</span>
+        <h4>Field Service / Trades</h4>
+        <p>HVAC, plumbing, electrical, gate/access, pest control, roofing</p>
+      </div>
+      <div class="option-card" data-type="professional" onclick="selectBizType(this)">
+        <span class="icon">💼</span>
+        <h4>Professional Services</h4>
+        <p>Law, accounting, consulting, marketing agency</p>
+      </div>
+      <div class="option-card" data-type="realestate" onclick="selectBizType(this)">
+        <span class="icon">🏢</span>
+        <h4>Real Estate / Property Mgmt</h4>
+        <p>Residential, commercial, HOA, multifamily</p>
+      </div>
+      <div class="option-card" data-type="retail" onclick="selectBizType(this)">
+        <span class="icon">🛒</span>
+        <h4>Retail / E-Commerce</h4>
+        <p>Physical stores, online shops, DTC brands</p>
+      </div>
+      <div class="option-card" data-type="healthcare" onclick="selectBizType(this)">
+        <span class="icon">🏥</span>
+        <h4>Healthcare / Medical</h4>
+        <p>Medical practice, dental, chiropractic, wellness</p>
+      </div>
+      <div class="option-card" data-type="other" onclick="selectBizType(this)">
+        <span class="icon">🏗️</span>
+        <h4>Other</h4>
+        <p>Something else entirely</p>
+      </div>
+    </div>
+
+    <div class="field" id="otherTypeField" style="display:none;">
+      <label>Describe your business type</label>
+      <input type="text" id="otherTypeInput" placeholder="e.g., logistics, manufacturing, education...">
+    </div>
+
+    <div class="nav-buttons">
+      <div></div>
+      <button class="btn btn-next" id="step1Next" disabled onclick="goStep(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Business Basics -->
+  <div class="step" id="step2">
+    <div class="step-header">
+      <div class="step-num">Step 2</div>
+      <h2>Tell us about your business</h2>
+      <p>Basic info helps us understand the scale and complexity of your operation.</p>
+    </div>
+
+    <div class="field">
+      <label>Company Name</label>
+      <input type="text" id="companyName" placeholder="Your company name">
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="contactName" placeholder="First and last name">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="text" id="contactEmail" placeholder="you@company.com">
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Team Size</label>
+        <select id="teamSize">
+          <option value="">Select...</option>
+          <option>Just me</option>
+          <option>2–5 people</option>
+          <option>6–15 people</option>
+          <option>16–30 people</option>
+          <option>31–75 people</option>
+          <option>75+ people</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Annual Revenue</label>
+        <select id="revenue">
+          <option value="">Select...</option>
+          <option>Under $250K</option>
+          <option>$250K – $500K</option>
+          <option>$500K – $1M</option>
+          <option>$1M – $5M</option>
+          <option>$5M – $10M</option>
+          <option>$10M+</option>
+          <option>Prefer not to say</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>What software do you currently use?</label>
+      <div class="hint">CRM, accounting, scheduling, project management, etc.</div>
+      <textarea id="currentSoftware" rows="3" placeholder="e.g., QuickBooks, ServiceTitan, Google Workspace, Slack, Jobber..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Primary communication tools</label>
+      <div class="hint">How does your team and customers communicate day-to-day?</div>
+      <textarea id="commTools" rows="2" placeholder="e.g., Email, phone, text, Slack, Teams..."></textarea>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-back" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-next" onclick="goStep(3)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Industry-Specific Questions -->
+  <div class="step" id="step3">
+    <div class="step-header">
+      <div class="step-num">Step 3</div>
+      <h2 id="step3Title">Industry-Specific Questions</h2>
+      <p>These questions are tailored to your business type. They help us identify the highest-impact automation opportunities.</p>
+    </div>
+
+    <!-- TRADES -->
+    <div class="industry-section" id="section-trades" style="display:none;">
+      <div class="field">
+        <label>How do you currently handle dispatch and scheduling?</label>
+        <select id="trDispatch">
+          <option value="">Select...</option>
+          <option>Phone/text — manual coordination</option>
+          <option>Dispatch board in FSM software</option>
+          <option>Dedicated dispatcher on staff</option>
+          <option>Owner handles it personally</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Field service management software</label>
+        <select id="trFSM">
+          <option value="">Select...</option>
+          <option>ServiceTitan</option>
+          <option>Housecall Pro</option>
+          <option>Jobber</option>
+          <option>FieldEdge</option>
+          <option>Service Fusion</option>
+          <option>None — spreadsheets/paper</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>How are estimates created and sent?</label>
+        <textarea id="trEstimates" rows="2" placeholder="e.g., Tech builds in field, office emails PDF, verbal quote on-site..."></textarea>
+      </div>
+      <div class="field">
+        <label>Do you have a process for reviewing completed jobs for quality?</label>
+        <select id="trQA">
+          <option value="">Select...</option>
+          <option>No formal process</option>
+          <option>Spot checks by manager</option>
+          <option>Checklist in FSM software</option>
+          <option>Every job reviewed before close-out</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- PROFESSIONAL SERVICES -->
+    <div class="industry-section" id="section-professional" style="display:none;">
+      <div class="field">
+        <label>How do new clients get onboarded?</label>
+        <select id="prIntake">
+          <option value="">Select...</option>
+          <option>Manual — email/phone back-and-forth</option>
+          <option>Online form + manual follow-up</option>
+          <option>CRM-driven workflow</option>
+          <option>No formal process</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Billing cycle and invoicing method</label>
+        <select id="prBilling">
+          <option value="">Select...</option>
+          <option>Monthly invoicing — manual</option>
+          <option>Automated recurring billing</option>
+          <option>Project-based invoicing</option>
+          <option>Hourly with time tracking</option>
+          <option>Mix of methods</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>How do you manage documents and client files?</label>
+        <textarea id="prDocs" rows="2" placeholder="e.g., Google Drive folders, practice management software, SharePoint..."></textarea>
+      </div>
+      <div class="field">
+        <label>How is time tracked?</label>
+        <select id="prTime">
+          <option value="">Select...</option>
+          <option>Manual entry / spreadsheets</option>
+          <option>Dedicated time tracking software</option>
+          <option>Built into practice management tool</option>
+          <option>We don't track time</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- REAL ESTATE -->
+    <div class="industry-section" id="section-realestate" style="display:none;">
+      <div class="field">
+        <label>How do tenants submit maintenance requests?</label>
+        <select id="reRequests">
+          <option value="">Select...</option>
+          <option>Phone calls or texts</option>
+          <option>Email</option>
+          <option>Tenant portal / app</option>
+          <option>Mix of everything</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>How do you communicate with tenants?</label>
+        <select id="reComms">
+          <option value="">Select...</option>
+          <option>Individual emails or texts</option>
+          <option>Property management software</option>
+          <option>Bulk email tool (Mailchimp, etc.)</option>
+          <option>No consistent method</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>How are leases tracked and renewals managed?</label>
+        <textarea id="reLeases" rows="2" placeholder="e.g., Spreadsheet, property management software, paper files..."></textarea>
+      </div>
+      <div class="field">
+        <label>Rent collection method</label>
+        <select id="reCollections">
+          <option value="">Select...</option>
+          <option>Online payment portal</option>
+          <option>Checks / manual deposits</option>
+          <option>ACH through PM software</option>
+          <option>Mix — some online, some manual</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- RETAIL -->
+    <div class="industry-section" id="section-retail" style="display:none;">
+      <div class="field">
+        <label>How do you manage inventory?</label>
+        <select id="rtInventory">
+          <option value="">Select...</option>
+          <option>POS system with inventory tracking</option>
+          <option>Spreadsheets</option>
+          <option>Dedicated inventory software</option>
+          <option>E-commerce platform built-in</option>
+          <option>No formal tracking</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Order fulfillment process</label>
+        <select id="rtFulfill">
+          <option value="">Select...</option>
+          <option>In-house manual fulfillment</option>
+          <option>3PL / warehouse partner</option>
+          <option>Dropshipping</option>
+          <option>Mix of methods</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>How do you follow up with customers post-purchase?</label>
+        <textarea id="rtFollowup" rows="2" placeholder="e.g., Automated emails, manual outreach, we don't..."></textarea>
+      </div>
+      <div class="field">
+        <label>How do you handle vendor communications and reordering?</label>
+        <textarea id="rtVendors" rows="2" placeholder="e.g., Email vendors manually, EDI, auto-reorder rules..."></textarea>
+      </div>
+    </div>
+
+    <!-- HEALTHCARE -->
+    <div class="industry-section" id="section-healthcare" style="display:none;">
+      <div class="field">
+        <label>Patient scheduling method</label>
+        <select id="hcScheduling">
+          <option value="">Select...</option>
+          <option>Phone — front desk books manually</option>
+          <option>Online booking system</option>
+          <option>EHR/EMR built-in scheduling</option>
+          <option>Mix of phone and online</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Insurance billing and claims process</label>
+        <select id="hcBilling">
+          <option value="">Select...</option>
+          <option>In-house billing team</option>
+          <option>Outsourced billing company</option>
+          <option>Practice management software</option>
+          <option>Cash/self-pay only</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Records management system</label>
+        <select id="hcRecords">
+          <option value="">Select...</option>
+          <option>Full EHR/EMR system</option>
+          <option>Basic digital records</option>
+          <option>Paper charts + some digital</option>
+          <option>Mostly paper</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Biggest administrative burden</label>
+        <textarea id="hcBurden" rows="2" placeholder="e.g., Insurance pre-authorizations, patient follow-ups, claim denials..."></textarea>
+      </div>
+    </div>
+
+    <!-- OTHER -->
+    <div class="industry-section" id="section-other" style="display:none;">
+      <div class="field">
+        <label>Describe your core business operations</label>
+        <textarea id="otOps" rows="3" placeholder="Walk us through a typical day — what are the main operational workflows?"></textarea>
+      </div>
+      <div class="field">
+        <label>What's your primary customer/client interaction workflow?</label>
+        <textarea id="otWorkflow" rows="2" placeholder="How do customers engage with you, from first contact to delivery?"></textarea>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-back" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-next" onclick="goStep(4)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Pain Points & Time -->
+  <div class="step" id="step4">
+    <div class="step-header">
+      <div class="step-num">Step 4</div>
+      <h2>Where does your time go?</h2>
+      <p>Understanding your pain points helps us prioritize which AI agents will have the biggest ROI.</p>
+    </div>
+
+    <div class="field">
+      <label>Hours per week your team spends on repetitive admin tasks</label>
+      <div class="slider-wrap">
+        <input type="range" min="0" max="60" value="15" id="hoursSlider" oninput="document.getElementById('hoursVal').textContent = this.value + 'h'">
+        <div class="slider-val" id="hoursVal">15h</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>What are your biggest administrative pain points?</label>
+      <div class="hint">Select all that apply</div>
+      <div class="choice-group vertical">
+        <label class="choice-pill"><input type="checkbox" value="Collections / chasing payments"> Collections / chasing payments</label>
+        <label class="choice-pill"><input type="checkbox" value="Scheduling / calendar management"> Scheduling / calendar management</label>
+        <label class="choice-pill"><input type="checkbox" value="Customer communications / follow-ups"> Customer communications / follow-ups</label>
+        <label class="choice-pill"><input type="checkbox" value="Data entry / manual record keeping"> Data entry / manual record keeping</label>
+        <label class="choice-pill"><input type="checkbox" value="Invoicing / billing"> Invoicing / billing</label>
+        <label class="choice-pill"><input type="checkbox" value="Quality control / job review"> Quality control / job review</label>
+        <label class="choice-pill"><input type="checkbox" value="Reporting / KPI tracking"> Reporting / KPI tracking</label>
+        <label class="choice-pill"><input type="checkbox" value="Email management / inbox overload"> Email management / inbox overload</label>
+        <label class="choice-pill"><input type="checkbox" value="Hiring / onboarding"> Hiring / onboarding</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>What's the one task you wish you never had to do again?</label>
+      <textarea id="wishGone" rows="2" placeholder="Be specific — this often becomes our first automation target"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Have you tried any AI tools before? (ChatGPT, Copilot, Zapier AI, etc.)</label>
+      <select id="priorAI">
+        <option value="">Select...</option>
+        <option>No, this is all new to me</option>
+        <option>I've experimented with ChatGPT / similar</option>
+        <option>We use basic automations (Zapier, Make, etc.)</option>
+        <option>We have some AI tools in production</option>
+      </select>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-back" onclick="goStep(3)">← Back</button>
+      <button class="btn btn-next" onclick="goStep(5)">Review Your Answers →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: Review & Submit -->
+  <div class="step" id="step5">
+    <div class="step-header">
+      <div class="step-num">Step 5</div>
+      <h2>Review &amp; Submit</h2>
+      <p>Here's a summary of your answers. Hit submit and we'll get back to you within 24 hours with a personalized AI automation plan.</p>
+    </div>
+
+    <div id="summaryContent"></div>
+
+    <div style="text-align: center; margin-top: 32px;">
+      <button class="btn btn-submit" id="submitBtn" onclick="submitAssessment()">Submit Assessment →</button>
+    </div>
+
+    <div style="text-align: center; margin-top: 16px;">
+      <button class="btn btn-back" onclick="copyResults()" style="font-size: 12px; border: none; color: var(--text-dim); padding: 8px 16px;">📋 Or copy to clipboard</button>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-back" onclick="goStep(4)">← Back</button>
+      <div></div>
+    </div>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">🎯</div>
+    <h2>Assessment Submitted!</h2>
+    <p>Thanks for completing the AI Readiness Assessment. Evan will personally review your answers and get back to you within 24 hours with a tailored automation plan for your business.</p>
+    <div class="cta-line">
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Want to skip the wait? Book a call now:</p>
+      <button data-cal-link="evan-varnon-t4isuz/30min" data-cal-config='{"layout":"month_view"}' class="btn btn-submit" style="font-family: inherit;">Book a Free Consultation →</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="copied-toast" id="copiedToast">✓ Copied to clipboard!</div>
+
+<div class="footer">
+  <strong style="color:var(--text);">LetAtlas</strong> &nbsp;|&nbsp; AI Automation for Your Back Office &nbsp;|&nbsp; <a href="https://letatlas.ai">letatlas.ai</a>
+</div>
+
+<script>
+  let selectedBizType = '';
+  const totalSteps = 5;
+
+  function selectBizType(card) {
+    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedBizType = card.dataset.type;
+    document.getElementById('step1Next').disabled = false;
+    document.getElementById('otherTypeField').style.display = selectedBizType === 'other' ? 'block' : 'none';
+  }
+
+  function goStep(n) {
+    // If advancing to step 3, show the right industry section
+    if (n === 3) {
+      document.querySelectorAll('.industry-section').forEach(s => s.style.display = 'none');
+      const sec = document.getElementById('section-' + selectedBizType);
+      if (sec) sec.style.display = 'block';
+
+      const titles = {
+        trades: 'Field Service & Trades — Operations',
+        professional: 'Professional Services — Operations',
+        realestate: 'Real Estate & Property Management — Operations',
+        retail: 'Retail & E-Commerce — Operations',
+        healthcare: 'Healthcare & Medical — Operations',
+        other: 'Your Operations'
+      };
+      document.getElementById('step3Title').textContent = titles[selectedBizType] || 'Industry Questions';
+    }
+
+    // If advancing to step 5, build summary
+    if (n === 5) buildSummary();
+
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + n).classList.add('active');
+
+    // Update progress
+    const pct = Math.round((n / totalSteps) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = 'Step ' + n + ' of ' + totalSteps;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function gatherData() {
+    const bizLabels = {
+      trades: 'Field Service / Trades',
+      professional: 'Professional Services',
+      realestate: 'Real Estate / Property Management',
+      retail: 'Retail / E-Commerce',
+      healthcare: 'Healthcare / Medical Practice',
+      other: 'Other: ' + (document.getElementById('otherTypeInput')?.value || '')
+    };
+
+    const data = {
+      'Business Type': bizLabels[selectedBizType] || selectedBizType,
+      'Company': document.getElementById('companyName')?.value || '',
+      'Contact': document.getElementById('contactName')?.value || '',
+      'Email': document.getElementById('contactEmail')?.value || '',
+      'Team Size': document.getElementById('teamSize')?.value || '',
+      'Annual Revenue': document.getElementById('revenue')?.value || '',
+      'Current Software': document.getElementById('currentSoftware')?.value || '',
+      'Communication Tools': document.getElementById('commTools')?.value || '',
+    };
+
+    // Industry-specific
+    const industryData = {};
+    if (selectedBizType === 'trades') {
+      industryData['Dispatch Method'] = document.getElementById('trDispatch')?.value || '';
+      industryData['FSM Software'] = document.getElementById('trFSM')?.value || '';
+      industryData['Estimate Process'] = document.getElementById('trEstimates')?.value || '';
+      industryData['QA Process'] = document.getElementById('trQA')?.value || '';
+    } else if (selectedBizType === 'professional') {
+      industryData['Client Intake'] = document.getElementById('prIntake')?.value || '';
+      industryData['Billing Cycle'] = document.getElementById('prBilling')?.value || '';
+      industryData['Document Management'] = document.getElementById('prDocs')?.value || '';
+      industryData['Time Tracking'] = document.getElementById('prTime')?.value || '';
+    } else if (selectedBizType === 'realestate') {
+      industryData['Maintenance Requests'] = document.getElementById('reRequests')?.value || '';
+      industryData['Tenant Communication'] = document.getElementById('reComms')?.value || '';
+      industryData['Lease Management'] = document.getElementById('reLeases')?.value || '';
+      industryData['Rent Collection'] = document.getElementById('reCollections')?.value || '';
+    } else if (selectedBizType === 'retail') {
+      industryData['Inventory Management'] = document.getElementById('rtInventory')?.value || '';
+      industryData['Order Fulfillment'] = document.getElementById('rtFulfill')?.value || '';
+      industryData['Customer Follow-up'] = document.getElementById('rtFollowup')?.value || '';
+      industryData['Vendor Management'] = document.getElementById('rtVendors')?.value || '';
+    } else if (selectedBizType === 'healthcare') {
+      industryData['Patient Scheduling'] = document.getElementById('hcScheduling')?.value || '';
+      industryData['Insurance Billing'] = document.getElementById('hcBilling')?.value || '';
+      industryData['Records Management'] = document.getElementById('hcRecords')?.value || '';
+      industryData['Biggest Admin Burden'] = document.getElementById('hcBurden')?.value || '';
+    } else {
+      industryData['Core Operations'] = document.getElementById('otOps')?.value || '';
+      industryData['Client Workflow'] = document.getElementById('otWorkflow')?.value || '';
+    }
+
+    // Pain points
+    const painPoints = [];
+    document.querySelectorAll('#step4 .choice-pill input:checked').forEach(cb => {
+      painPoints.push(cb.value);
+    });
+
+    const painData = {
+      'Weekly Admin Hours': document.getElementById('hoursSlider')?.value + ' hours',
+      'Pain Points': painPoints.join(', ') || 'None selected',
+      'Task to Eliminate': document.getElementById('wishGone')?.value || '',
+      'Prior AI Experience': document.getElementById('priorAI')?.value || '',
+    };
+
+    return { data, industryData, painData };
+  }
+
+  function buildSummary() {
+    const { data, industryData, painData } = gatherData();
+    let html = '';
+
+    html += '<div class="summary-block"><h3>Business Info</h3>';
+    for (const [k, v] of Object.entries(data)) {
+      html += `<div class="summary-row"><span class="label">${k}</span><span class="value">${v || '—'}</span></div>`;
+    }
+    html += '</div>';
+
+    html += '<div class="summary-block"><h3>Industry Details</h3>';
+    for (const [k, v] of Object.entries(industryData)) {
+      html += `<div class="summary-row"><span class="label">${k}</span><span class="value">${v || '—'}</span></div>`;
+    }
+    html += '</div>';
+
+    html += '<div class="summary-block"><h3>Pain Points & Priorities</h3>';
+    for (const [k, v] of Object.entries(painData)) {
+      html += `<div class="summary-row"><span class="label">${k}</span><span class="value">${v || '—'}</span></div>`;
+    }
+    html += '</div>';
+
+    document.getElementById('summaryContent').innerHTML = html;
+  }
+
+  function formatResultsText() {
+    const { data, industryData, painData } = gatherData();
+    let text = '=== AI READINESS ASSESSMENT — LETATLAS ===\n\n';
+
+    text += '--- Business Info ---\n';
+    for (const [k, v] of Object.entries(data)) text += k + ': ' + (v || '—') + '\n';
+
+    text += '\n--- Industry Details ---\n';
+    for (const [k, v] of Object.entries(industryData)) text += k + ': ' + (v || '—') + '\n';
+
+    text += '\n--- Pain Points & Priorities ---\n';
+    for (const [k, v] of Object.entries(painData)) text += k + ': ' + (v || '—') + '\n';
+
+    text += '\n--- Submitted via letatlas.ai ---\n';
+    return text;
+  }
+
+  function copyResults() {
+    const text = formatResultsText();
+    navigator.clipboard.writeText(text).then(() => {
+      const toast = document.getElementById('copiedToast');
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 2500);
+    });
+  }
+
+  function emailResults() {
+    const text = formatResultsText();
+    const subject = encodeURIComponent('AI Readiness Assessment — ' + (document.getElementById('companyName')?.value || 'New Prospect'));
+    const body = encodeURIComponent(text);
+    window.open('mailto:evan@letatlas.ai?subject=' + subject + '&body=' + body);
+  }
+
+  function gatherApiPayload() {
+    const bizLabels = {
+      trades: 'Field Service / Trades',
+      professional: 'Professional Services',
+      realestate: 'Real Estate / Property Management',
+      retail: 'Retail / E-Commerce',
+      healthcare: 'Healthcare / Medical Practice',
+      other: 'Other: ' + (document.getElementById('otherTypeInput')?.value || '')
+    };
+
+    const painPoints = [];
+    document.querySelectorAll('#step4 .choice-pill input:checked').forEach(cb => {
+      painPoints.push(cb.value);
+    });
+
+    const industryData = {};
+    if (selectedBizType === 'trades') {
+      industryData['Dispatch Method'] = document.getElementById('trDispatch')?.value || '';
+      industryData['FSM Software'] = document.getElementById('trFSM')?.value || '';
+      industryData['Estimate Process'] = document.getElementById('trEstimates')?.value || '';
+      industryData['QA Process'] = document.getElementById('trQA')?.value || '';
+    } else if (selectedBizType === 'professional') {
+      industryData['Client Intake'] = document.getElementById('prIntake')?.value || '';
+      industryData['Billing Cycle'] = document.getElementById('prBilling')?.value || '';
+      industryData['Document Management'] = document.getElementById('prDocs')?.value || '';
+      industryData['Time Tracking'] = document.getElementById('prTime')?.value || '';
+    } else if (selectedBizType === 'realestate') {
+      industryData['Maintenance Requests'] = document.getElementById('reRequests')?.value || '';
+      industryData['Tenant Communication'] = document.getElementById('reComms')?.value || '';
+      industryData['Lease Management'] = document.getElementById('reLeases')?.value || '';
+      industryData['Rent Collection'] = document.getElementById('reCollections')?.value || '';
+    } else if (selectedBizType === 'retail') {
+      industryData['Inventory Management'] = document.getElementById('rtInventory')?.value || '';
+      industryData['Order Fulfillment'] = document.getElementById('rtFulfill')?.value || '';
+      industryData['Customer Follow-up'] = document.getElementById('rtFollowup')?.value || '';
+      industryData['Vendor Management'] = document.getElementById('rtVendors')?.value || '';
+    } else if (selectedBizType === 'healthcare') {
+      industryData['Patient Scheduling'] = document.getElementById('hcScheduling')?.value || '';
+      industryData['Insurance Billing'] = document.getElementById('hcBilling')?.value || '';
+      industryData['Records Management'] = document.getElementById('hcRecords')?.value || '';
+      industryData['Biggest Admin Burden'] = document.getElementById('hcBurden')?.value || '';
+    } else {
+      industryData['Core Operations'] = document.getElementById('otOps')?.value || '';
+      industryData['Client Workflow'] = document.getElementById('otWorkflow')?.value || '';
+    }
+
+    return {
+      businessType: bizLabels[selectedBizType] || selectedBizType,
+      companyName: document.getElementById('companyName')?.value || '',
+      contactName: document.getElementById('contactName')?.value || '',
+      contactEmail: document.getElementById('contactEmail')?.value || '',
+      teamSize: document.getElementById('teamSize')?.value || '',
+      revenue: document.getElementById('revenue')?.value || '',
+      currentSoftware: document.getElementById('currentSoftware')?.value || '',
+      commTools: document.getElementById('commTools')?.value || '',
+      industryData: industryData,
+      adminHours: (document.getElementById('hoursSlider')?.value || '15') + ' hours/week',
+      painPoints: painPoints,
+      wishGone: document.getElementById('wishGone')?.value || '',
+      priorAI: document.getElementById('priorAI')?.value || '',
+    };
+  }
+
+  async function submitAssessment() {
+    const btn = document.getElementById('submitBtn');
+    btn.classList.add('btn-loading');
+    btn.textContent = 'Submitting...';
+
+    const payload = gatherApiPayload();
+
+    // Fire API call but don't block on it
+    fetch('/api/submit-assessment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(error => console.error('Submit error:', error));
+
+    // Always show success screen
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.querySelector('.progress-wrap').style.display = 'none';
+    document.getElementById('successScreen').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
