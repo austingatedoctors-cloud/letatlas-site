@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google tag (gtag.js) - Google Ads Conversion Tracking -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-994728635"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-994728635');
+</script>
 <title>AI Readiness Assessment — LetAtlas</title>
 <!-- Cal.com inline embed -->
 <script type="text/javascript">
@@ -908,7 +916,7 @@ Cal("ui", {"styles":{"branding":{"brandColor":"#1B3A5C"}},"hideEventTypeDetails"
     <p>Thanks for completing the AI Readiness Assessment. Evan will personally review your answers and get back to you within 24 hours with a tailored automation plan for your business.</p>
     <div class="cta-line">
       <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Want to skip the wait? Book a call now:</p>
-      <button data-cal-link="evan-varnon-t4isuz/30min" data-cal-config='{"layout":"month_view"}' class="btn btn-submit" style="font-family: inherit;">Book a Free Consultation →</button>
+      <button data-cal-link="evan-varnon-t4isuz/30min" data-cal-config='{"layout":"month_view"}' class="btn btn-submit" style="font-family: inherit;" onclick="if(typeof gtag==='function'){gtag('event','conversion',{'send_to':'AW-994728635/trycCP_6opAcELu1qdoD'})}">Book a Free Consultation →</button>
     </div>
   </div>
 
@@ -1159,6 +1167,11 @@ Cal("ui", {"styles":{"branding":{"brandColor":"#1B3A5C"}},"hideEventTypeDetails"
     btn.textContent = 'Submitting...';
 
     const payload = gatherApiPayload();
+
+    // Fire Google Ads conversion tracking - Assessment Submission
+    if (typeof gtag === 'function') {
+      gtag('event', 'conversion', {'send_to': 'AW-994728635/zRRlCPz6opAcELu1qdoD'});
+    }
 
     // Fire API call but don't block on it
     fetch('/api/submit-assessment', {
